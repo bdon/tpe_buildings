@@ -1,14 +1,14 @@
-from zipfile import ZipFile
-from lxml import etree
-from util import xpath, xpatht, xpathf
-from collada import Collada
-from collada.common import DaeMalformedError, DaeBrokenRefError
 import StringIO
 import re
-import numpy as np
+from zipfile import ZipFile
 
+import numpy as np
+from lxml import etree
+from collada import Collada
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
+
+from util import xpath, xpatht, xpathf
 
 region = 'kmzs/3357/3156_r14.kmz'
 
