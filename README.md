@@ -5,18 +5,10 @@ https://github.com/sheethub/tpe3d/issues/1
 
 workflow
 ---
-KML --> postgis table of all buildings, heights, tags
+KML/KMZ is converted to a postgis table of all buildings
 
-postgis db --> X000_Y000.geojson/.osm tiles
+buildings are then divided into a 0.002x0.002 degree grid (roughly 3300)
 
+example X040_Y050.geojson
 
-tags
----
-building name?
-source file?
-
-todo
----
-filter out complicated buildings
-how big should tiles be?
-local chapter approval
+a geojson file and OSM changeset is then generated for each grid
