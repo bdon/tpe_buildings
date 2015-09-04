@@ -6,3 +6,7 @@ regions.geojson:
 
 clean:
 	rm regions.geojson
+
+sql:
+	psql tpe_buildings -f setup.sql 
+	

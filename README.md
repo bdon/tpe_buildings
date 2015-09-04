@@ -5,9 +5,9 @@ https://github.com/sheethub/tpe3d/issues/1
 
 workflow
 ---
-KML --> Spatialite table of all buildings, heights, tags
+KML --> postgis table of all buildings, heights, tags
 
-Spatialite DB --> X000_Y000.geojson/.osm tiles
+postgis db --> X000_Y000.geojson/.osm tiles
 
 
 tags
@@ -18,5 +18,5 @@ source file?
 todo
 ---
 filter out complicated buildings
-
-
+how big should tiles be?
+local chapter approval
