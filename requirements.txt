@@ -2,3 +2,4 @@ lxml>=3.4.4
 shapely>=1.5.12
 pycollada>=0.4.1
 pyproj>=1.9.4
+pyspatialite==2.6.2-spatialite.2.4.0-4
