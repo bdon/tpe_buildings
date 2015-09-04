@@ -75,22 +75,12 @@ def region2features(region):
           pass
         return False
 
-      #print tris
       valid_tris = filter(r,tris)
-      #print valid_tris
-
       footprint = unary_union(valid_tris)
       assert height is not None
 
       # http://spatialreference.org/ref/epsg/3826/html/
       twd97 = Proj(init='epsg:3826')
-
-      def unproject_simple(x,y):
-        earth_radius = 6378137
-        degree_lng_meters = 2 * math.pi * earth_radius / 360;
-        degree_lat_meters = 2 * math.pi * earth_radius * math.cos(math.pi * lat / 180) / 360
-        return (lon + (x * inch_to_meters / degree_lng_meters),
-                lat + (y * inch_to_meters / degree_lat_meters))
 
       def unproject_twd97(x,y):
         x_meters = x * inch_to_meters
@@ -100,21 +90,12 @@ def region2features(region):
         return twd97(x0 + x_meters,y0+y_meters,inverse=True)
 
       unprojected = transform(unproject_twd97,footprint)
-      #features.append({'type':'Feature','geometry':mapping(unprojected),'properties':{'height':height,'name':name}})
       cur.execute("INSERT INTO buildings(id, geom, height) VALUES (%s,ST_SetSRID(%s::geometry,4326),%s)",(name,unprojected.wkt,height))
       conn.commit()
   return features
 
 if __name__ == '__main__':
-  #features.extend(region2features('kmzs/3357/3156_r14.kmz'))
   for d in glob.glob('kmzs/*'):
     dirname = d[5:9]
     for thing in glob.glob('kmzs/'+dirname+'/*.kmz'):
       region2features(thing)
-
-
-    #with open(dirname + '.geojson','w') as out:
-    #  out.write(json.dumps({'type':'FeatureCollection','features':features}))
-
-  #with open('3156_r14.geojson','w') as out:
-  #  out.write(json.dumps({'type':'FeatureCollection','features':features}))

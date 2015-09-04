@@ -1,8 +1,4 @@
-# start with a full building database.
-# find the extent of the dataset
-
 import psycopg2
-import psycopg2.extras
 import json
 from shapely.wkb import loads
 from shapely.geometry import box, mapping
