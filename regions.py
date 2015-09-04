@@ -1,27 +1,21 @@
 import os
 import json
+from util import xpath, xpatht, xpathf
 
 from lxml import etree
 from shapely.geometry import box, mapping
 
 # Gather all directories from the root KML file.
 root = etree.parse("kmzs/Taipei3DBuilding_nl.kml")
-ns = { 'n':'http://www.opengis.net/kml/2.2' }
 
 features = []
 
-def xpatht(elem,query):
-  return elem.xpath(query,namespaces=ns)[0].text
-
-def xpathf(elem,query):
-  return float(xpatht(elem,query))
-
-for folder in root.xpath("/n:kml/n:Document/n:NetworkLink",namespaces=ns):
+for folder in xpath(root,"/n:kml/n:Document/n:NetworkLink"):
   folder_name = xpatht(folder,"n:name")
   print "Traversing folder " + folder_name
   folder_link = xpatht(folder,"n:Link/n:href").replace("\\","/")
   folder_root = etree.parse("kmzs/" + folder_link)
-  for superregion in folder_root.xpath("/n:kml/n:Folder/n:NetworkLink",namespaces=ns):
+  for superregion in xpath(folder_root,"/n:kml/n:Folder/n:NetworkLink"):
     sr_name = xpatht(superregion,"n:name")
     print "Traversing super region " + sr_name
     sr_link  = xpatht(superregion,"n:Link/n:href").replace("\\","/")
@@ -32,7 +26,7 @@ for folder in root.xpath("/n:kml/n:Document/n:NetworkLink",namespaces=ns):
     #print north, south, east, west, link, name
     sr_path = "kmzs/" + folder_name + "/" + sr_link
     sr_root = etree.parse(sr_path)
-    for region in sr_root.xpath("/n:kml/n:Document/n:NetworkLink",namespaces=ns):
+    for region in xpath(sr_root,"/n:kml/n:Document/n:NetworkLink"):
       # altitude?
       r_name = xpatht(region,"n:name")
       r_link  = xpatht(region,"n:Link/n:href").replace("\\","/")
