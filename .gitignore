@@ -1,3 +1,4 @@
 kmzs
 *.swp
 venv
+*.pyc
