@@ -12,10 +12,15 @@ from collada import Collada
 from shapely.geometry import Polygon, mapping
 from shapely.ops import unary_union, transform
 from pyproj import Proj
+import psycopg2
 
 from util import xpath, xpatht, xpathf
 
 ns = {'c':"http://www.collada.org/2005/11/COLLADASchema"}
+
+conn = psycopg2.connect(dbname='tpe_buildings')
+cur = conn.cursor()
+inch_to_meters = 0.0254
 
 def repairDAE(model):
   #for s in model.xpath("//c:mesh/c:source",namespaces=ns):
@@ -56,18 +61,29 @@ def region2features(region):
         triset = geom.primitives[0]
         heights = np.unique(np.hstack([[point[2] for point in tri] for tri in triset.vertex[triset.vertex_index]]))
         if len(heights) == 1:
-          height = float(heights[0])
+          height = float(heights[0]) * inch_to_meters
           # the mesh is parallel to the xy plane
           for tri in triset.vertex[triset.vertex_index]:
             tri_p = Polygon([(tri[0][0],tri[0][1]),(tri[1][0],tri[1][1]),(tri[2][0],tri[2][1])])
             tris.append(tri_p)
 
-      footprint = unary_union([t for t in tris if t.area > 0])
+      def r(t):
+        try:
+          if t.area > 0:
+            return True
+        except:
+          pass
+        return False
+
+      #print tris
+      valid_tris = filter(r,tris)
+      #print valid_tris
+
+      footprint = unary_union(valid_tris)
       assert height is not None
 
       # http://spatialreference.org/ref/epsg/3826/html/
       twd97 = Proj(init='epsg:3826')
-      inch_to_meters = 0.02534
 
       def unproject_simple(x,y):
         earth_radius = 6378137
@@ -84,18 +100,21 @@ def region2features(region):
         return twd97(x0 + x_meters,y0+y_meters,inverse=True)
 
       unprojected = transform(unproject_twd97,footprint)
-      features.append({'type':'Feature','geometry':mapping(unprojected),'properties':{'height':height,'name':name}})
+      #features.append({'type':'Feature','geometry':mapping(unprojected),'properties':{'height':height,'name':name}})
+      cur.execute("INSERT INTO buildings(id, geom, height) VALUES (%s,ST_SetSRID(%s::geometry,4326),%s)",(name,unprojected.wkt,height))
+      conn.commit()
   return features
 
 if __name__ == '__main__':
-  features = []
   #features.extend(region2features('kmzs/3357/3156_r14.kmz'))
   for d in glob.glob('kmzs/*'):
     dirname = d[5:9]
     for thing in glob.glob('kmzs/'+dirname+'/*.kmz'):
-      features.extend(region2features(thing))
-    with open(dirname + '.geojson','w') as out:
-      out.write(json.dumps({'type':'FeatureCollection','features':features}))
+      region2features(thing)
+
+
+    #with open(dirname + '.geojson','w') as out:
+    #  out.write(json.dumps({'type':'FeatureCollection','features':features}))
 
   #with open('3156_r14.geojson','w') as out:
   #  out.write(json.dumps({'type':'FeatureCollection','features':features}))
