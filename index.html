@@ -46,7 +46,7 @@
           onEachFeature: function(feature,layer) {
             layer.bindPopup(feature.properties.filename);
             layer.on("click", function(e) {
-              d3.json('tasks/' + feature.properties.filename + '.geojson', function(d) {
+              d3.json('http://tpe-buildings.s3-ap-northeast-1.amazonaws.com/geojsons/' + feature.properties.filename + '.geojson.gz', function(d) {
                   L.geoJson(d,{style:buildingStyle}).addTo(map);
               });
             });
