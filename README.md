@@ -5,10 +5,8 @@ https://github.com/sheethub/tpe3d/issues/1
 
 workflow
 ---
-KML/KMZ is converted to a postgis table of all buildings
+KML/KMZ Collada models are converted to a postgis table of all building footprints, with a height value based on the highest vertex
 
-buildings are then divided into a 0.002x0.002 degree grid (roughly 3300)
+Create a raster tileset using Mapnik labeled by height value
 
-example X040_Y050.geojson
-
-a geojson file and OSM changeset is then generated for each grid
+Use tileset as background in iD editor
