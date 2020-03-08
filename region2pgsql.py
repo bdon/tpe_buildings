@@ -12,15 +12,13 @@ from collada import Collada
 from shapely.geometry import Polygon, mapping
 from shapely.ops import unary_union, transform
 from pyproj import Proj
-import psycopg2
 
 from util import xpath, xpatht, xpathf
 
 ns = {'c':"http://www.collada.org/2005/11/COLLADASchema"}
 
-conn = psycopg2.connect(dbname='tpe_buildings')
-cur = conn.cursor()
 inch_to_meters = 0.0254
+twd97 = Proj(init='epsg:3826')
 
 def repairDAE(model):
   #for s in model.xpath("//c:mesh/c:source",namespaces=ns):
@@ -33,6 +31,8 @@ def repairDAE(model):
   # malformed DAE - delete normals, we don't need them anyways.
   for i in model.xpath("//c:input[@semantic='NORMAL']",namespaces=ns):
     i.getparent().remove(i)
+
+result = []
 
 
 def region2features(region):
@@ -79,8 +79,6 @@ def region2features(region):
       assert height is not None
 
       # http://spatialreference.org/ref/epsg/3826/html/
-      twd97 = Proj(init='epsg:3826')
-
       def unproject_twd97(x,y):
         x_meters = x * inch_to_meters
         y_meters = y * inch_to_meters
@@ -89,8 +87,7 @@ def region2features(region):
         return twd97(x0 + x_meters,y0+y_meters,inverse=True)
 
       unprojected = transform(unproject_twd97,footprint)
-      cur.execute("INSERT INTO buildings(id, geom, height) VALUES (%s,ST_SetSRID(%s::geometry,4326),%s)",(name,unprojected.wkt,height))
-      conn.commit()
+      result.append({'type':'Feature','geometry':mapping(unprojected),'properties':{'height':height}})
   return features
 
 if __name__ == '__main__':
@@ -98,3 +95,5 @@ if __name__ == '__main__':
     dirname = d[5:9]
     for thing in glob.glob('kmzs/'+dirname+'/*.kmz'):
       region2features(thing)
+  with open('out.geojson','w') as out:
+    out.write(json.dumps({'type':'FeatureCollection','features':result}))
