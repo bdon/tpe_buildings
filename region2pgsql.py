@@ -1,4 +1,4 @@
-import StringIO
+import io
 import re
 import math
 import json
@@ -37,7 +37,6 @@ def repairDAE(model):
 
 def region2features(region):
   features = []
-  print region
   # 1_4741
   m = re.search('/([\d_r]+).kmz',region)
   kml_name = m.group(1) + ".kml"
@@ -52,7 +51,7 @@ def region2features(region):
       xml = myzip.open(link)
       model = etree.parse(xml)
       repairDAE(model)
-      c = Collada(StringIO.StringIO(etree.tostring(model)))
+      c = Collada(io.BytesIO(etree.tostring(model)))
 
       tris = []
       height = None
@@ -75,7 +74,7 @@ def region2features(region):
           pass
         return False
 
-      valid_tris = filter(r,tris)
+      valid_tris = list(filter(r,tris))
       footprint = unary_union(valid_tris)
       assert height is not None
 
