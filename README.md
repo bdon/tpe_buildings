@@ -7,6 +7,6 @@ workflow
 ---
 KML/KMZ Collada models are converted to a postgis table of all building footprints, with a height value based on the highest vertex
 
-Create a raster tileset using Mapnik labeled by height value
+Create a vector tileset using Tippecanoe labeled by height value
 
-Use tileset as background in iD editor
+Convert vector to raster tiles for use as a background in iD editor
