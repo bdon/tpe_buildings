@@ -1,0 +1,46 @@
+{
+  "version": 8,
+  "name": "test",
+  "light": {"anchor": "viewport", "color": "white", "intensity": 0.3},
+  "sources": {
+    "buildings": {
+      "type": "vector",
+      "minzoom": 0,
+      "maxzoom": 14,
+      "tiles": ["asset://tiles/{z}/{x}/{y}.pbf"]
+    }
+  },
+  "glyphs": "asset://{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {"background-color": "rgba(43, 43, 43, 1)"}
+    },
+    {
+      "id": "buildings",
+      "type": "fill",
+      "source": "buildings",
+      "source-layer": "out",
+      "layout": {"visibility": "visible"},
+      "paint": {
+        "fill-color": "blue"
+      }
+    },
+    {
+      "id": "height_label",
+      "type": "symbol",
+      "source": "buildings",
+      "source-layer": "out",
+      "minzoom":15,
+      "layout": {
+        "symbol-placement": "point",
+        "text-field": "{height}",
+        "text-anchor": "bottom",
+        "text-font": ["Regular"],
+        "text-size": {"base": 1, "stops": [[16, 11], [18, 16]]}
+      },
+      "paint": {"text-color": "rgba(122, 122, 122, 1)"}
+    }
+  ]
+}
