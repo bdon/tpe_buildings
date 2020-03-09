@@ -2,3 +2,4 @@ kmzs
 *.swp
 venv
 *.pyc
+*.sqlite
