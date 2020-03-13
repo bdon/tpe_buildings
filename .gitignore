@@ -3,3 +3,5 @@ kmzs
 venv
 *.pyc
 *.sqlite
+vector_tiles
+tpe_buildings.geojson
