@@ -7,10 +7,10 @@
       "type": "vector",
       "minzoom": 0,
       "maxzoom": 14,
-      "tiles": ["asset://tiles/{z}/{x}/{y}.pbf"]
+      "tiles": ["asset://vector_tiles_uncompressed/{z}/{x}/{y}.pbf"]
     }
   },
-  "glyphs": "asset://{fontstack}/{range}.pbf",
+  "glyphs": "asset://asset/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "background",
@@ -21,7 +21,7 @@
       "id": "buildings",
       "type": "fill",
       "source": "buildings",
-      "source-layer": "out",
+      "source-layer": "tpe_buildings",
       "layout": {"visibility": "visible"},
       "paint": {
         "fill-color": "blue"
@@ -31,7 +31,7 @@
       "id": "height_label",
       "type": "symbol",
       "source": "buildings",
-      "source-layer": "out",
+      "source-layer": "tpe_buildings",
       "minzoom":15,
       "layout": {
         "symbol-placement": "point",
@@ -40,7 +40,7 @@
         "text-font": ["Regular"],
         "text-size": {"base": 1, "stops": [[16, 11], [18, 16]]}
       },
-      "paint": {"text-color": "rgba(122, 122, 122, 1)"}
+      "paint": {"text-color": "white"}
     }
   ]
 }
