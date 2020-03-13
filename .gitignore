@@ -3,5 +3,7 @@ kmzs
 venv
 *.pyc
 *.sqlite
-vector_tiles
+vector_tiles_compressed
+vector_tiles_uncompressed
+raster_tiles
 tpe_buildings.geojson
