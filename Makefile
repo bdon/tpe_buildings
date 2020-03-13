@@ -1,21 +1,10 @@
 dev:
-	python -m SimpleHTTPServer 8000 .
+	python -m http.server 9000
 
 regions.geojson:
-	python regions.py
+	python kmz2geojson.py > tpe_buildings.geojson
+	tippecanoe --force -z14 -e vector_tiles tpe_buildings.geojson
 
 clean:
-	rm regions.geojson
+	rm tpe_buildings.geojson
 
-sql:
-	psql tpe_buildings -f setup.sql 
-	
-tasks:
-	output all tasks GeoJSONs
-
-compress:
-	cd tasks
-	find . -name '*.geojson' -exec gzip "{}" \;
-
-sync:
-	s3cmd sync --exclude '.DS_Store' --exclude '*.swp' tasks/ s3://tpe-buildings/geojsons/ --add-header='Content-Encoding: gzip'

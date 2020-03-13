@@ -9,14 +9,12 @@ from lxml import etree
 from pyproj import Proj
 
 nskml = { 'n':'http://www.opengis.net/kml/2.2' }
-nsdae = { 'n':'http://www.collada.org/2005/11/COLLADASchema' }
 twd97 = Proj('epsg:3826')
 inch_to_meters = 0.0254
 
 all_feats = []
 
 def grouper(n, iterable, padvalue=None):
-  "grouper(3, 'abcdefg', 'x') --> ('a','b','c'), ('d','e','f'), ('g','x','x')"
   return zip_longest(*[iter(iterable)]*n, fillvalue=padvalue)
 
 def xpath(elem,query,ns):
@@ -38,7 +36,8 @@ def makeShape(l,height,lon,lat):
   if len(l) < 4:
     return
   geog = [unproject_twd97(*p) for p in l]
-  all_feats.append({'type':'Feature','properties':{'height':height*inch_to_meters},'geometry':{'coordinates':[geog],'type':'Polygon'}})
+  meters = round(height * inch_to_meters,1)
+  all_feats.append({'type':'Feature','properties':{'height':meters},'geometry':{'coordinates':[geog],'type':'Polygon'}})
 
 def region2features(region):
   features = []
@@ -52,23 +51,19 @@ def region2features(region):
       lat = xpathf(placemark,"n:Model/n:Location/n:latitude",nskml)
       link = xpatht(placemark,"n:Model/n:Link/n:href",nskml)
       xml = myzip.open(link)
+
       model = etree.parse(xml)
+      # the first geom is always the "roof planar set of triangles"
       inst_geom = model.find('.//{http://www.collada.org/2005/11/COLLADASchema}instance_geometry')
-      #for inst_geom in model.findall('.//{http://www.collada.org/2005/11/COLLADASchema}instance_geometry'):
       geom_url = inst_geom.get('url')[1:]
       geom = model.find(".//{http://www.collada.org/2005/11/COLLADASchema}geometry[@id='" + geom_url + "']")
-      # the first oen is a mesh
       vals = [float(v) for v in geom.findtext(".//{http://www.collada.org/2005/11/COLLADASchema}float_array").split(' ') if len(v) > 0]
       points = list(grouper(3,vals))
-
       triindexes = [int(v) for v in geom.findtext(".//{http://www.collada.org/2005/11/COLLADASchema}triangles/{http://www.collada.org/2005/11/COLLADASchema}p").split(' ') if len(v) > 0]
       tris = list(grouper(3,(triindexes[::2])))
-
-      # the first geom is always the "roof planar set of triangles"
       height = points[tris[0][0]][2]
       for tri in tris:
         assert points[tri[0]][2] == height
-
       makeShape([(p[0],p[1]) for p in points], height,lon,lat)
 
 if __name__ == '__main__':
