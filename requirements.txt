@@ -1,4 +1,4 @@
 lxml>=3.4.4
 pyproj>=1.9.4
 mercantile==1.1.2
-Pillow==7.0.0
+Pillow==8.1.1
